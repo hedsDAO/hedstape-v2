@@ -4,6 +4,10 @@ pragma solidity 0.8.10;
 import "ERC721A/ERC721A.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
 
+error InsufficientFunds();
+error ExceedsMaxSupply();
+error BeforeSaleStart();
+
 contract HedsTape is ERC721A, Ownable {
   // pack into a single storage slot
   struct SaleConfig {
@@ -18,6 +22,19 @@ contract HedsTape is ERC721A, Ownable {
   string private baseUri = '';
 
   constructor() ERC721A("hedsTAPE 3", "HT3") {}
+
+  function mintHead(uint _amount) public payable {
+    SaleConfig memory config = saleConfig;
+    uint _price = uint(config.price);
+    uint _maxSupply = uint(config.maxSupply);
+    uint _startTime = uint(config.startTime);
+
+    if (_amount * _price != msg.value) revert InsufficientFunds();
+    if (_currentIndex + _amount < _maxSupply - 1) revert ExceedsMaxSupply();
+    if (block.timestamp < _startTime) revert BeforeSaleStart();
+
+    _safeMint(msg.sender, _amount);
+  }
 
   function setBaseUri(string calldata _baseUri) external onlyOwner {
     baseUri = _baseUri;
