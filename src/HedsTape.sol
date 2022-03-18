@@ -7,6 +7,7 @@ import "openzeppelin-contracts/contracts/access/Ownable.sol";
 error InsufficientFunds();
 error ExceedsMaxSupply();
 error BeforeSaleStart();
+error FailedTransfer();
 
 contract HedsTape is ERC721A, Ownable {
   // pack into a single storage slot
@@ -51,5 +52,10 @@ contract HedsTape is ERC721A, Ownable {
       _maxSupply,
       _startTime
     );
+  }
+
+  function withdraw() public onlyOwner {
+    (bool success, ) = msg.sender.call{value: address(this).balance}("");
+    if (!success) revert FailedTransfer();
   }
 }
