@@ -82,4 +82,23 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         uint valueToSend = uint(price) * uint(maxSupply);
         hedsTape.mintHead{value: valueToSend}(maxSupply);
     }
+
+    function testTokenURI() public {
+        hedsTape.setBaseUri("ipfs://sup");
+
+        hedsTape.updateStartTime(1650000000);
+        cheats.warp(1650000000);
+        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
+        uint valueToSend = uint(price) * uint(maxSupply);
+        hedsTape.mintHead{value: valueToSend}(maxSupply);
+
+        string memory uri = hedsTape.tokenURI(0);
+        assertEq(uri, "ipfs://sup");
+    }
+
+    function testSetBaseUriNotOwner() public {
+        cheats.expectRevert(bytes("Ownable: caller is not the owner"));
+        cheats.prank(address(1));
+        hedsTape.setBaseUri("ipfs://sup");
+    }
 }
