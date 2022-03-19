@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.10;
 
-import "ERC721A/ERC721A.sol";
+import "./lib/ERC721A.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
 
 error InsufficientFunds();
