@@ -39,22 +39,26 @@ contract HedsTapeTest is DSTest {
     function testFailMintHeadBeforeStartTime() public {
         hedsTape.updateStartTime(1650000000);
         cheats.warp(1649999999);
-        hedsTape.mintHead{value: 100000000000000000}(1);
+        (uint64 price, ,) = hedsTape.saleConfig();
+        hedsTape.mintHead{value: price}(1);
     }
 
     function testFailMintHeadNoStartTime() public {
-        hedsTape.mintHead{value: 100000000000000000}(1);
+        (uint64 price, ,) = hedsTape.saleConfig();
+        hedsTape.mintHead{value: price}(1);
     }
 
     function testFailMintHeadInsufficientFunds() public {
         hedsTape.updateStartTime(1650000000);
         cheats.warp(1650000000);
-        hedsTape.mintHead{value: 10000000000000000}(1);
+        (uint64 price, ,) = hedsTape.saleConfig();
+        hedsTape.mintHead{value: price - 1}(1);
     }
 
     function testFailMintHeadsBeyondMaxSupply() public {
         hedsTape.updateStartTime(1650000000);
         cheats.warp(1650000000);
-        hedsTape.mintHead{value: 100100000000000000000}(1001);
+        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
+        hedsTape.mintHead{value: price * maxSupply + 1}(maxSupply + 1);
     }
 }
