@@ -118,6 +118,12 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(balanceAfter - balanceBefore, amount);
     }
 
+    function testWithdrawNotOwner() public {
+        cheats.expectRevert(bytes("Ownable: caller is not the owner"));
+        cheats.prank(address(1));
+        hedsTape.withdraw();
+    }
+
     fallback() external payable {}
     receive() external payable {}
 }
