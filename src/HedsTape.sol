@@ -25,7 +25,11 @@ contract HedsTape is ERC721A, Ownable {
   // TODO: pre-fill with uri
   string private baseUri = '';
 
-  constructor() ERC721A("hedsTAPE 3", "HT3") {}
+  constructor() ERC721A("hedsTAPE 3", "HT3") {
+    saleConfig.price = 100000000000000000; // 0.1 ETH
+    // TODO: Update maxSupply
+    saleConfig.maxSupply = 1000; 
+  }
 
   /// @notice Mint a HedsTape token
   /// @param _amount Number of tokens to mint
@@ -54,13 +58,9 @@ contract HedsTape is ERC721A, Ownable {
     return baseUri;
   }
 
-  /// @notice Update token sale data - must be contract owner
-  function setSaleConfig(uint64 _price, uint32 _maxSupply, uint32 _startTime) external onlyOwner {
-    saleConfig = SaleConfig(
-      _price,
-      _maxSupply,
-      _startTime
-    );
+  /// @notice Update sale start time - must be contract owner
+  function updateStartTime(uint32 _startTime) external onlyOwner {
+    saleConfig.startTime = _startTime;
   }
 
   /// @notice Withdraw contract balance - must be contract owner
