@@ -29,6 +29,8 @@ contract HedsTape is ERC721A, Ownable {
     saleConfig.price = 100000000000000000; // 0.1 ETH
     // TODO: Update maxSupply
     saleConfig.maxSupply = 1000; 
+    // TODO: Update startTime
+    saleConfig.startTime = 0;
   }
 
   /// @notice Mint a HedsTape token
