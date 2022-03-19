@@ -59,6 +59,7 @@ contract HedsTapeTest is DSTest {
         hedsTape.updateStartTime(1650000000);
         cheats.warp(1650000000);
         (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
-        hedsTape.mintHead{value: price * maxSupply + 1}(maxSupply + 1);
+        uint valueToSend = uint(price) * uint(maxSupply + 1);
+        hedsTape.mintHead{value: valueToSend}(maxSupply + 1);
     }
 }
