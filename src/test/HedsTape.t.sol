@@ -7,9 +7,11 @@ import "../HedsTape.sol";
 interface CheatCodes {
   function prank(address) external;
   function expectRevert(bytes calldata) external;
+  function expectRevert(bytes4) external;
+  function warp(uint256) external;
 }
 
-contract ContractTest is DSTest {
+contract HedsTapeTest is DSTest {
     CheatCodes cheats = CheatCodes(HEVM_ADDRESS);
     HedsTape hedsTape;
 
@@ -32,5 +34,11 @@ contract ContractTest is DSTest {
         cheats.expectRevert(bytes("Ownable: caller is not the owner"));
         cheats.prank(address(0));
         hedsTape.updateStartTime(1647721808);
+    }
+
+    function testFailMintHeadBeforeStartTime() public {
+        hedsTape.updateStartTime(1650000000);
+        cheats.warp(1649999999);
+        hedsTape.mintHead{value: 100000000000000000}(1);
     }
 }
