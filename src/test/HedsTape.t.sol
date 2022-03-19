@@ -101,4 +101,23 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         cheats.prank(address(1));
         hedsTape.setBaseUri("ipfs://sup");
     }
+
+    function testWithdraw() public {
+        hedsTape.updateStartTime(1650000000);
+        cheats.warp(1650000000);
+        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
+        uint amount = uint(price) * uint(maxSupply);
+        hedsTape.mintHead{value: amount}(maxSupply);
+
+        assertEq(address(hedsTape).balance, amount);
+
+        uint balanceBefore = address(this).balance;
+        hedsTape.withdraw();
+        uint balanceAfter = address(this).balance;
+
+        assertEq(balanceAfter - balanceBefore, amount);
+    }
+
+    fallback() external payable {}
+    receive() external payable {}
 }

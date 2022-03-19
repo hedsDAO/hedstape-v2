@@ -67,7 +67,7 @@ contract HedsTape is ERC721A, Ownable {
 
   /// @notice Withdraw contract balance - must be contract owner
   function withdraw() public onlyOwner {
-    (bool success, ) = msg.sender.call{value: address(this).balance}("");
+    (bool success, ) = payable(msg.sender).call{value: address(this).balance}("");
     if (!success) revert FailedTransfer();
   }
 }
