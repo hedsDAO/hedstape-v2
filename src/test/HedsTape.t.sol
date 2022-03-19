@@ -41,4 +41,14 @@ contract HedsTapeTest is DSTest {
         cheats.warp(1649999999);
         hedsTape.mintHead{value: 100000000000000000}(1);
     }
+
+    function testFailMintHeadNoStartTime() public {
+        hedsTape.mintHead{value: 100000000000000000}(1);
+    }
+
+    function testFailMintHeadInsufficientFunds() public {
+        hedsTape.updateStartTime(1650000000);
+        cheats.warp(1650000000);
+        hedsTape.mintHead{value: 10000000000000000}(1);
+    }
 }
