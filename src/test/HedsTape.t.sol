@@ -74,4 +74,12 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         (uint64 price, ,) = hedsTape.saleConfig();
         hedsTape.mintHead{value: price}(1);
     }
+
+    function testMintHeadsUpToMaxSupply() public {
+        hedsTape.updateStartTime(1650000000);
+        cheats.warp(1650000000);
+        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
+        uint valueToSend = uint(price) * uint(maxSupply);
+        hedsTape.mintHead{value: valueToSend}(maxSupply);
+    }
 }
