@@ -42,7 +42,7 @@ contract HedsTape is ERC721A, Ownable {
     uint _startTime = uint(config.startTime);
 
     if (_amount * _price != msg.value) revert InsufficientFunds();
-    if (_currentIndex + _amount > _maxSupply - 1) revert ExceedsMaxSupply();
+    if (_currentIndex + _amount > _maxSupply) revert ExceedsMaxSupply();
     if (_startTime == 0 || block.timestamp < _startTime) revert BeforeSaleStart();
 
     _safeMint(msg.sender, _amount);
