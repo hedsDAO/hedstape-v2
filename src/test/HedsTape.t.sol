@@ -134,7 +134,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     address[] addresses;
     uint[] mints;
 
-    function testSeedWhitelsit() public {
+    function testSeedWhitelist() public {
         addresses.push(address(1));
         mints.push(5);
         hedsTape.seedWhitelist(addresses, mints);
