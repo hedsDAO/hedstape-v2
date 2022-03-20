@@ -75,7 +75,7 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
     _safeMint(msg.sender, _amount);
   }
 
-  function seedWhitelist(address[] memory addresses, uint256[] memory mints)
+  function seedWhitelist(address[] calldata addresses, uint256[] calldata mints)
     external
     onlyOwner
   {
