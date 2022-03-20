@@ -68,6 +68,11 @@ contract HedsTape is ERC721A, Ownable {
     saleConfig.startTime = _startTime;
   }
 
+  /// @notice Update whitelist start time - must be contract owner
+  function updateWhitelistStartTime(uint32 _whitelistStartTime) external onlyOwner {
+    saleConfig.whitelistStartTime = _whitelistStartTime;
+  }
+
   /// @notice Withdraw contract balance - must be contract owner
   function withdraw() public onlyOwner {
     (bool success, ) = payable(msg.sender).call{value: address(this).balance}("");
