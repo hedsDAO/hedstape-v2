@@ -14,7 +14,7 @@ error UnmatchedLength();
 
 /// @title ERC721 contract for https://heds.io/ HedsTape
 /// @author https://github.com/kadenzipfel
-contract HedsTape is ERC721A, Ownable {
+contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
   struct SaleConfig {
     uint64 price;
     uint32 maxSupply;
