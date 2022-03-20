@@ -3,11 +3,13 @@ pragma solidity 0.8.10;
 
 import "./lib/ERC721A.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
+import "solmate/utils/ReentrancyGuard.sol";
 
 error InsufficientFunds();
 error ExceedsMaxSupply();
 error BeforeSaleStart();
 error FailedTransfer();
+error ExceedsWhitelistAllowance();
 
 /// @title ERC721 contract for https://heds.io/ HedsTape
 /// @author https://github.com/kadenzipfel
@@ -22,6 +24,9 @@ contract HedsTape is ERC721A, Ownable {
   /// @notice NFT sale data
   /// @dev Sale data packed into single storage slot
   SaleConfig public saleConfig;
+
+  /// @notice Remaining whitelist mints per address
+  mapping(address => uint) public whitelist;
 
   // TODO: pre-fill with uri
   string private baseUri = '';
@@ -38,7 +43,7 @@ contract HedsTape is ERC721A, Ownable {
 
   /// @notice Mint a HedsTape token
   /// @param _amount Number of tokens to mint
-  function mintHead(uint _amount) public payable {
+  function mintHead(uint _amount) external payable {
     SaleConfig memory config = saleConfig;
     uint _price = uint(config.price);
     uint _maxSupply = uint(config.maxSupply);
@@ -51,6 +56,24 @@ contract HedsTape is ERC721A, Ownable {
     _safeMint(msg.sender, _amount);
   }
 
+  /// @notice Mint a HedsTape as a whitelisted individual
+  /// @dev Must use reentrancy guard to prevent onERC721Received callback reentrancy
+  /// @param _amount Number of tokens to mint
+  function whitelistMintHead(uint _amount) external payable nonReentrant {
+    SaleConfig memory config = saleConfig;
+    uint _price = uint(config.price);
+    uint _maxSupply = uint(config.maxSupply);
+    uint _whitelistStartTime = uint(config.whitelistStartTime);
+
+    if (_amount * _price != msg.value) revert InsufficientFunds();
+    if (_currentIndex + _amount > _maxSupply) revert ExceedsMaxSupply();
+    if (_whitelistStartTime == 0 || block.timestamp < _whitelistStartTime) revert BeforeSaleStart();
+    if (_amount > whitelist[msg.sender]) revert ExceedsWhitelistAllowance();
+
+    whitelist[msg.sender] -= _amount;
+    _safeMint(msg.sender, _amount);
+  }
+ 
   /// @notice Update baseUri - must be contract owner
   function setBaseUri(string calldata _baseUri) external onlyOwner {
     baseUri = _baseUri;
