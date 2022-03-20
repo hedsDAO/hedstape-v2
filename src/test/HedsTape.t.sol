@@ -124,6 +124,13 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.withdraw();
     }
 
+    function testFailNotWhitelistedMint() public {
+        hedsTape.updateWhitelistStartTime(1650000000);
+        cheats.warp(1650000000);
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        hedsTape.whitelistMintHead{value: price}(1);
+    }
+
     fallback() external payable {}
     receive() external payable {}
 }
