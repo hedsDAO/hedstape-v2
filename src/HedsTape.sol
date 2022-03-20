@@ -10,6 +10,7 @@ error ExceedsMaxSupply();
 error BeforeSaleStart();
 error FailedTransfer();
 error ExceedsWhitelistAllowance();
+error UnmatchedLength();
 
 /// @title ERC721 contract for https://heds.io/ HedsTape
 /// @author https://github.com/kadenzipfel
@@ -72,6 +73,16 @@ contract HedsTape is ERC721A, Ownable {
 
     whitelist[msg.sender] -= _amount;
     _safeMint(msg.sender, _amount);
+  }
+
+  function seedWhitelist(address[] memory addresses, uint256[] memory mints)
+    external
+    onlyOwner
+  {
+    if (address.length != mints.length) revert UnmatchedLength();
+    for (uint256 i = 0; i < addresses.length; i++) {
+      whitelist[addresses[i]] = mints[i];
+    }
   }
  
   /// @notice Update baseUri - must be contract owner
