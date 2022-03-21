@@ -33,7 +33,7 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
   string private baseUri = '';
 
   constructor() ERC721A("hedsTAPE 3", "HT3") {
-    saleConfig.price = 100000000000000000; // 0.1 ETH
+    saleConfig.price = 0.1 ether;
     // TODO: Update maxSupply
     saleConfig.maxSupply = 1100; 
     // TODO: Update startTime
