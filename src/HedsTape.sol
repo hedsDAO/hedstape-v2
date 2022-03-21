@@ -75,6 +75,10 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
     _safeMint(msg.sender, _amount);
   }
 
+  /// @notice Seed whitelist data - must be contract owner
+  /// @dev Each call will overwrite all existing whitelist data
+  /// @param addresses Array of addresses to provide data for
+  /// @param mints Array of number of mints allowed per corresponding address
   function seedWhitelist(address[] calldata addresses, uint256[] calldata mints)
     external
     onlyOwner
