@@ -34,12 +34,9 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
 
   constructor() ERC721A("hedsTAPE 3", "HT3") {
     saleConfig.price = 0.1 ether;
-    // TODO: Update maxSupply
-    saleConfig.maxSupply = 1100; 
-    // TODO: Update startTime
-    saleConfig.startTime = 0;
-    // TODO: Update whitelistStartTime
-    saleConfig.whitelistStartTime = 0;
+    saleConfig.maxSupply = 1000;
+    saleConfig.startTime = 1649530800;
+    saleConfig.whitelistStartTime = 1649527200;
   }
 
   /// @notice Mint a HedsTape token
