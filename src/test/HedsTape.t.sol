@@ -25,16 +25,16 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     }
 
     function testUpdateStartTimeAsOwner() public {
-        hedsTape.updateStartTime(1647721808);
+        hedsTape.updateStartTime(1650000000);
         (, , uint32 newStartTime, ) = hedsTape.saleConfig();
 
-        assertEq(newStartTime, 1647721808);
+        assertEq(newStartTime, 1650000000);
     }
 
     function testUpdateStartTimeAsNotOwner() public {
         cheats.expectRevert(bytes("Ownable: caller is not the owner"));
         cheats.prank(address(0));
-        hedsTape.updateStartTime(1647721808);
+        hedsTape.updateStartTime(1650000000);
     }
 
     function testFailMintHeadBeforeStartTime() public {
