@@ -25,10 +25,6 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     }
 
     function testUpdateStartTimeAsOwner() public {
-        (, , uint32 startTime, ) = hedsTape.saleConfig();
-
-        assertEq(startTime, 0);
-
         hedsTape.updateStartTime(1647721808);
         (, , uint32 newStartTime, ) = hedsTape.saleConfig();
 
