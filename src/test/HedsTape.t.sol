@@ -45,6 +45,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     }
 
     function testFailMintHeadNoStartTime() public {
+        hedsTape.updateStartTime(0);
         (uint64 price, , ,) = hedsTape.saleConfig();
         hedsTape.mintHead{value: price}(1);
     }
