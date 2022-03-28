@@ -81,8 +81,12 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
     onlyOwner
   {
     if (addresses.length != mints.length) revert UnmatchedLength();
-    for (uint256 i = 0; i < addresses.length; i++) {
-      whitelist[addresses[i]] = mints[i];
+    
+    // Overflow impossible
+    unchecked {
+      for (uint256 i = 0; i < addresses.length; ++i) {
+        whitelist[addresses[i]] = mints[i];
+      }
     }
   }
  

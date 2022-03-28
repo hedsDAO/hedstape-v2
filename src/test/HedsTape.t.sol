@@ -133,10 +133,18 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
     function testSeedWhitelist() public {
         addresses.push(address(1));
+        addresses.push(address(2));
+        addresses.push(address(3));
         mints.push(5);
+        mints.push(10);
+        mints.push(15);
         hedsTape.seedWhitelist(addresses, mints);
-        uint availableMints = hedsTape.whitelist(address(1));
-        assertEq(availableMints, 5);
+        uint availableMints1 = hedsTape.whitelist(address(1));
+        assertEq(availableMints1, 5);
+        uint availableMints2 = hedsTape.whitelist(address(2));
+        assertEq(availableMints2, 10);
+        uint availableMints3 = hedsTape.whitelist(address(3));
+        assertEq(availableMints3, 15);
     }
 
     function testFailExcessiveWhitelistMint() public {
