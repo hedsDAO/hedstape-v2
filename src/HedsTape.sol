@@ -49,7 +49,7 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
 
     if (_amount * _price != msg.value) revert InsufficientFunds();
     if (_currentIndex + _amount > _maxSupply) revert ExceedsMaxSupply();
-    if (_startTime == 0 || block.timestamp < _startTime) revert BeforeSaleStart();
+    if (block.timestamp < _startTime) revert BeforeSaleStart();
 
     _safeMint(msg.sender, _amount);
   }
@@ -65,7 +65,7 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
 
     if (_amount * _price != msg.value) revert InsufficientFunds();
     if (_currentIndex + _amount > _maxSupply) revert ExceedsMaxSupply();
-    if (_whitelistStartTime == 0 || block.timestamp < _whitelistStartTime) revert BeforeSaleStart();
+    if (block.timestamp < _whitelistStartTime) revert BeforeSaleStart();
     if (_amount > whitelist[msg.sender]) revert ExceedsWhitelistAllowance();
 
     whitelist[msg.sender] -= _amount;
