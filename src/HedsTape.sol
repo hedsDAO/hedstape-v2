@@ -9,8 +9,6 @@ error InsufficientFunds();
 error ExceedsMaxSupply();
 error BeforeSaleStart();
 error FailedTransfer();
-error ExceedsWhitelistAllowance();
-error UnmatchedLength();
 
 /// @title ERC721 contract for https://heds.io/ HedsTape
 /// @author https://github.com/kadenzipfel
@@ -19,15 +17,11 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
     uint64 price;
     uint32 maxSupply;
     uint32 startTime;
-    uint32 whitelistStartTime;
   }
 
   /// @notice NFT sale data
   /// @dev Sale data packed into single storage slot
   SaleConfig public saleConfig;
-
-  /// @notice Remaining whitelist mints per address
-  mapping(address => uint) public whitelist;
 
   // TODO: pre-fill with uri
   string private baseUri = '';
@@ -36,7 +30,6 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
     saleConfig.price = 0.1 ether;
     saleConfig.maxSupply = 1000;
     saleConfig.startTime = 1649530800;
-    saleConfig.whitelistStartTime = 1649527200;
   }
 
   /// @notice Mint a HedsTape token
@@ -52,42 +45,6 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
     if (block.timestamp < _startTime) revert BeforeSaleStart();
 
     _safeMint(msg.sender, _amount);
-  }
-
-  /// @notice Mint a HedsTape as a whitelisted individual
-  /// @dev Must use reentrancy guard to prevent onERC721Received callback reentrancy
-  /// @param _amount Number of tokens to mint
-  function whitelistMintHead(uint _amount) external payable nonReentrant {
-    SaleConfig memory config = saleConfig;
-    uint _price = uint(config.price);
-    uint _maxSupply = uint(config.maxSupply);
-    uint _whitelistStartTime = uint(config.whitelistStartTime);
-
-    if (_amount * _price != msg.value) revert InsufficientFunds();
-    if (_currentIndex + _amount > _maxSupply) revert ExceedsMaxSupply();
-    if (block.timestamp < _whitelistStartTime) revert BeforeSaleStart();
-    if (_amount > whitelist[msg.sender]) revert ExceedsWhitelistAllowance();
-
-    whitelist[msg.sender] -= _amount;
-    _safeMint(msg.sender, _amount);
-  }
-
-  /// @notice Seed whitelist data - must be contract owner
-  /// @dev Each call will overwrite all existing whitelist data
-  /// @param addresses Array of addresses to provide data for
-  /// @param mints Array of number of mints allowed per corresponding address
-  function seedWhitelist(address[] calldata addresses, uint256[] calldata mints)
-    external
-    onlyOwner
-  {
-    if (addresses.length != mints.length) revert UnmatchedLength();
-    
-    // Overflow impossible
-    unchecked {
-      for (uint256 i = 0; i < addresses.length; ++i) {
-        whitelist[addresses[i]] = mints[i];
-      }
-    }
   }
  
   /// @notice Update baseUri - must be contract owner
@@ -105,11 +62,6 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
   /// @notice Update sale start time - must be contract owner
   function updateStartTime(uint32 _startTime) external onlyOwner {
     saleConfig.startTime = _startTime;
-  }
-
-  /// @notice Update whitelist start time - must be contract owner
-  function updateWhitelistStartTime(uint32 _whitelistStartTime) external onlyOwner {
-    saleConfig.whitelistStartTime = _whitelistStartTime;
   }
 
   /// @notice Withdraw contract balance - must be contract owner
