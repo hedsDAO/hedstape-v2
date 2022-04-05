@@ -32,6 +32,10 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
     saleConfig.startTime = 1649530800;
   }
 
+  function _startTokenId() internal view virtual override returns (uint256) {
+    return 1;
+  }
+
   /// @notice Mint a HedsTape token
   /// @param _amount Number of tokens to mint
   function mintHead(uint _amount) external payable {
@@ -41,7 +45,7 @@ contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
     uint _startTime = uint(config.startTime);
 
     if (_amount * _price != msg.value) revert InsufficientFunds();
-    if (_currentIndex + _amount > _maxSupply) revert ExceedsMaxSupply();
+    if (_currentIndex + _amount > _maxSupply + 1) revert ExceedsMaxSupply();
     if (block.timestamp < _startTime) revert BeforeSaleStart();
 
     _safeMint(msg.sender, _amount);

@@ -83,7 +83,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         uint valueToSend = uint(price) * uint(maxSupply);
         hedsTape.mintHead{value: valueToSend}(maxSupply);
 
-        string memory uri = hedsTape.tokenURI(0);
+        string memory uri = hedsTape.tokenURI(1);
         assertEq(uri, "ipfs://sup");
     }
 
