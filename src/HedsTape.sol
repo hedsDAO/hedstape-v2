@@ -3,7 +3,6 @@ pragma solidity 0.8.10;
 
 import "./lib/ERC721A.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
-import "solmate/utils/ReentrancyGuard.sol";
 
 error InsufficientFunds();
 error ExceedsMaxSupply();
@@ -12,7 +11,7 @@ error FailedTransfer();
 
 /// @title ERC721 contract for https://heds.io/ HedsTape
 /// @author https://github.com/kadenzipfel
-contract HedsTape is ERC721A, Ownable, ReentrancyGuard {
+contract HedsTape is ERC721A, Ownable {
   struct SaleConfig {
     uint64 price;
     uint32 maxSupply;
