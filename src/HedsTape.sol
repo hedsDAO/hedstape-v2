@@ -9,6 +9,7 @@ error ExceedsMaxSupply();
 error BeforeSaleStart();
 error FailedTransfer();
 error URIQueryForNonexistentToken();
+error UnmatchedLength();
 
 /// @title ERC721 contract for https://heds.io/ HedsTape
 /// @author https://github.com/kadenzipfel
@@ -70,6 +71,21 @@ contract HedsTape is ERC721K, Ownable {
   /// @notice Update sale start time - must be contract owner
   function updateStartTime(uint32 _startTime) external onlyOwner {
     saleConfig.startTime = _startTime;
+  }
+
+  /// @notice Seed withdrawal data - must be contract owner
+  /// @dev Each call will overwrite previous data
+  /// @param _addresses array of addresses to seed withdrawal data for
+  /// @param _shares array of shareBps corresponding to addresses
+  function seedWithdrawalData(address[] calldata _addresses, uint64[] calldata _shares) external onlyOwner {
+    if (_addresses.length != _shares.length) revert UnmatchedLength();
+
+    // Overflow impossible
+    unchecked {
+      for (uint i = 0; i < _addresses.length; ++i) {
+        withdrawalData[_addresses[i]].shareBps = _shares[i];
+      }
+    }
   }
 
   /// @notice Withdraw contract balance - must be contract owner
