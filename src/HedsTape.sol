@@ -89,6 +89,8 @@ contract HedsTape is ERC721K, Ownable {
     }
   }
 
+  /// @notice Withdraw shares
+  /// @dev Withdraw shares based on withdrawal data to msg.sender
   function withdrawShare() external {
     WithdrawalData memory data = withdrawalData[msg.sender];
     if (data.shareBps == 0) revert NoShares();
