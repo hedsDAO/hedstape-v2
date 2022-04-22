@@ -19,9 +19,18 @@ contract HedsTape is ERC721K, Ownable {
     uint32 startTime;
   }
 
+  struct WithdrawalData {
+    uint64 shareBps;
+    uint64 amtWithdrawn;
+  }
+
   /// @notice NFT sale data
   /// @dev Sale data packed into single storage slot
   SaleConfig public saleConfig;
+
+  /// @notice Withdrawal data
+  /// @dev Withdrawal data packed into single storage slot
+  mapping(address => WithdrawalData) public withdrawalData;
 
   string private baseUri = 'ipfs://QmcQ5JySJAZC1sj69HGChncXx2omact5wFYEoxCoYv6scx';
 
