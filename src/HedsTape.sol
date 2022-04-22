@@ -10,6 +10,7 @@ error BeforeSaleStart();
 error FailedTransfer();
 error URIQueryForNonexistentToken();
 error UnmatchedLength();
+error NoShares();
 
 /// @title ERC721 contract for https://heds.io/ HedsTape
 /// @author https://github.com/kadenzipfel
@@ -73,7 +74,7 @@ contract HedsTape is ERC721K, Ownable {
     saleConfig.startTime = _startTime;
   }
 
-  /// @notice Seed withdrawal data - must be contract owner
+  /// @notice Seed withdrawal data - must be contract owner, shares MUST sum to 10000
   /// @dev Each call will overwrite previous data
   /// @param _addresses array of addresses to seed withdrawal data for
   /// @param _shares array of shareBps corresponding to addresses
@@ -86,6 +87,23 @@ contract HedsTape is ERC721K, Ownable {
         withdrawalData[_addresses[i]].shareBps = _shares[i];
       }
     }
+  }
+
+  function withdrawShare() external {
+    WithdrawalData memory data = withdrawalData[msg.sender];
+    if (data.shareBps == 0) revert NoShares();
+
+    uint _price = uint(saleConfig.price);
+    uint _shareBps = uint(data.shareBps);
+    uint _amtWithdrawn = uint(data.amtWithdrawn);
+    uint withdrawalAmt = _currentIndex - 1 - _amtWithdrawn;
+
+    withdrawalData[msg.sender].amtWithdrawn = currentIndex - 1;
+
+    uint amount = (withdrawalAmt * _shareBps * _price) / 10000;
+
+    (bool success, ) = payable(msg.sender).call{value: amount}("");
+    if (!success) revert FailedTransfer();
   }
 
   /// @notice Withdraw contract balance - must be contract owner
