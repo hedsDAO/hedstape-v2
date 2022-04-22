@@ -10,3 +10,6 @@
 [submodule "lib/solmate"]
 	path = lib/solmate
 	url = https://github.com/Rari-Capital/solmate
+[submodule "lib/ERC721K"]
+	path = lib/ERC721K
+	url = https://github.com/kadenzipfel/ERC721K
