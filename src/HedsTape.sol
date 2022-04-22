@@ -22,8 +22,7 @@ contract HedsTape is ERC721A, Ownable {
   /// @dev Sale data packed into single storage slot
   SaleConfig public saleConfig;
 
-  // TODO: pre-fill with uri
-  string private baseUri = '';
+  string private baseUri = 'ipfs://QmcQ5JySJAZC1sj69HGChncXx2omact5wFYEoxCoYv6scx';
 
   constructor() ERC721A("hedsTAPE 3", "HT3") {
     saleConfig.price = 0.1 ether;
