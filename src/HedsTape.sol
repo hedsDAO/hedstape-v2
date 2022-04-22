@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.10;
 
-import "./lib/ERC721A.sol";
+import "ERC721K/ERC721K.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
 
 error InsufficientFunds();
 error ExceedsMaxSupply();
 error BeforeSaleStart();
 error FailedTransfer();
+error URIQueryForNonexistentToken();
 
 /// @title ERC721 contract for https://heds.io/ HedsTape
 /// @author https://github.com/kadenzipfel
-contract HedsTape is ERC721A, Ownable {
+contract HedsTape is ERC721K, Ownable {
   struct SaleConfig {
     uint64 price;
     uint32 maxSupply;
@@ -24,14 +25,10 @@ contract HedsTape is ERC721A, Ownable {
 
   string private baseUri = 'ipfs://QmcQ5JySJAZC1sj69HGChncXx2omact5wFYEoxCoYv6scx';
 
-  constructor() ERC721A("hedsTAPE 3", "HT3") {
+  constructor() ERC721K("hedsTAPE 3", "HT3") {
     saleConfig.price = 0.1 ether;
     saleConfig.maxSupply = 500;
     saleConfig.startTime = 1649530800;
-  }
-
-  function _startTokenId() internal view virtual override returns (uint256) {
-    return 1;
   }
 
   /// @notice Mint a HedsTape token
@@ -57,7 +54,7 @@ contract HedsTape is ERC721A, Ownable {
   /// @notice Return tokenURI for a given token
   /// @dev Same tokenURI returned for all tokenId's
   function tokenURI(uint _tokenId) public view override returns (string memory) {
-    if (!_exists(_tokenId)) revert URIQueryForNonexistentToken();
+    if (0 == _tokenId || _tokenId > _currentIndex - 1) revert URIQueryForNonexistentToken();
     return baseUri;
   }
 
