@@ -15,6 +15,7 @@
 - [ ] seedWithdrawalData
   - Input array of addresses (e.g. [0xabc..., 0x123..., 0xa1b...]) and corresponding bps of total funds to allot to address
   - 10000 bps = 100%, so if you want to allot 10% of funds to an address, input 1000
+- [ ] Verify contract
 
 ### Notes:
 
