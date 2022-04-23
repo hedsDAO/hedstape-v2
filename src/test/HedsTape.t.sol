@@ -251,6 +251,64 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(balanceAfter4 - balanceBefore4, 0.12 ether);
     }
 
+    function testFailNotWhitelistedMint() public {
+        hedsTape.updateWhitelistStartTime(1650000000);
+        cheats.warp(1650000000);
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        hedsTape.whitelistMintHead{value: price}(1);
+    }
+
+    address[] whitelistAddresses;
+    uint[] mints;
+
+    function testSeedWhitelist() public {
+        whitelistAddresses.push(address(1));
+        whitelistAddresses.push(address(2));
+        whitelistAddresses.push(address(3));
+        mints.push(5);
+        mints.push(10);
+        mints.push(15);
+        hedsTape.seedWhitelist(whitelistAddresses, mints);
+        uint availableMints1 = hedsTape.whitelist(address(1));
+        assertEq(availableMints1, 5);
+        uint availableMints2 = hedsTape.whitelist(address(2));
+        assertEq(availableMints2, 10);
+        uint availableMints3 = hedsTape.whitelist(address(3));
+        assertEq(availableMints3, 15);
+    }
+
+    function testFailExcessiveWhitelistMint() public {
+        hedsTape.updateWhitelistStartTime(1650000000);
+        cheats.warp(1650000000);
+        whitelistAddresses.push(0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84);
+        mints.push(5);
+        hedsTape.seedWhitelist(whitelistAddresses, mints);
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        uint amount = uint(price) * 6;
+        hedsTape.whitelistMintHead{value: amount}(6);
+    }
+
+    function testFailWhitelistMintHeadBeforeStartTime() public {
+        hedsTape.updateWhitelistStartTime(1650000000);
+        cheats.warp(1649999999);
+        whitelistAddresses.push(0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84);
+        mints.push(5);
+        hedsTape.seedWhitelist(whitelistAddresses, mints);
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        hedsTape.whitelistMintHead{value: price}(1);
+    }
+
+    function testWhitelistMint() public {
+        hedsTape.updateWhitelistStartTime(1650000000);
+        cheats.warp(1650000000);
+        whitelistAddresses.push(0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84);
+        mints.push(5);
+        hedsTape.seedWhitelist(whitelistAddresses, mints);
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        uint amount = uint(price) * 5;
+        hedsTape.whitelistMintHead{value: amount}(5);
+    }
+
     fallback() external payable {}
     receive() external payable {}
 }
