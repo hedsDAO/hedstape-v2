@@ -158,7 +158,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(amtWithdrawn4, 0);
     }
 
-    function testFailSeedWithdrawalDataTooManyShares() public {
+    function testCannotSeedWithdrawalDataTooManyShares() public {
         addresses.push(address(1));
         addresses.push(address(2));
         addresses.push(address(3));
@@ -168,6 +168,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         shares.push(3000);
         shares.push(4001);
 
+        cheats.expectRevert(abi.encodeWithSignature("InvalidShareQuantity()"));
         hedsTape.seedWithdrawalData(addresses, shares);
     }
 
