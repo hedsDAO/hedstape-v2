@@ -40,6 +40,11 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.seedWithdrawalData(addresses, shares);
     }
 
+    function _beginSale() internal {
+        hedsTape.updateStartTime(1650000000);
+        cheats.warp(1650000000);
+    }
+
     function testUpdateStartTimeAsOwner() public {
         hedsTape.updateStartTime(1650000000);
         (, , uint32 newStartTime) = hedsTape.saleConfig();
@@ -61,30 +66,26 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     }
 
     function testFailMintHeadInsufficientFunds() public {
-        hedsTape.updateStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginSale();
         (uint64 price, ,) = hedsTape.saleConfig();
         hedsTape.mintHead{value: price - 1}(1);
     }
 
     function testFailMintHeadsBeyondMaxSupply() public {
-        hedsTape.updateStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginSale();
         (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
         uint valueToSend = uint(price) * uint(maxSupply + 1);
         hedsTape.mintHead{value: valueToSend}(maxSupply + 1);
     }
 
     function testMintHead() public {
-        hedsTape.updateStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginSale();
         (uint64 price, ,) = hedsTape.saleConfig();
         hedsTape.mintHead{value: price}(1);
     }
 
     function testMintHeadsUpToMaxSupply() public {
-        hedsTape.updateStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginSale();
         (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
         uint valueToSend = uint(price) * uint(maxSupply);
         hedsTape.mintHead{value: valueToSend}(maxSupply);
@@ -93,8 +94,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     function testTokenURI() public {
         hedsTape.setBaseUri("ipfs://sup");
 
-        hedsTape.updateStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginSale();
         (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
         uint valueToSend = uint(price) * uint(maxSupply);
         hedsTape.mintHead{value: valueToSend}(maxSupply);
@@ -110,8 +110,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     }
 
     function testWithdraw() public {
-        hedsTape.updateStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginSale();
         (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
         uint amount = uint(price) * uint(maxSupply);
         hedsTape.mintHead{value: amount}(maxSupply);
@@ -184,8 +183,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     function testWithdrawShare() public {
         _seedWithdrawalData();
 
-        hedsTape.updateStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginSale();
         hedsTape.mintHead{value: 0.3 ether}(3);
 
         cheats.prank(address(1));
@@ -198,8 +196,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     function testFailWithdrawShareUnauthorized() public {
         _seedWithdrawalData();
 
-        hedsTape.updateStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginSale();
         hedsTape.mintHead{value: 0.3 ether}(3);
 
         cheats.prank(address(5));
@@ -209,8 +206,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     function testCannotWithdrawExcessiveShare() public {
         _seedWithdrawalData();
 
-        hedsTape.updateStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginSale();
         hedsTape.mintHead{value: 0.3 ether}(3);
 
         uint balanceBefore = address(1).balance;
@@ -227,8 +223,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     function testWithdrawAllShares() public {
         _seedWithdrawalData();
 
-        hedsTape.updateStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginSale();
         hedsTape.mintHead{value: 0.3 ether}(3);
 
         cheats.prank(address(1));
