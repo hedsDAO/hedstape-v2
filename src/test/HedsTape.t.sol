@@ -73,9 +73,10 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.mintHead{value: price}(1);
     }
 
-    function testFailMintHeadInsufficientFunds() public {
+    function testCannotMintHeadInsufficientFunds() public {
         _beginSale();
         (uint64 price, , ,) = hedsTape.saleConfig();
+        cheats.expectRevert(abi.encodeWithSignature("InsufficientFunds()"));
         hedsTape.mintHead{value: price - 1}(1);
     }
 
