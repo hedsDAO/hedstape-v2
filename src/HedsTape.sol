@@ -11,6 +11,7 @@ error FailedTransfer();
 error URIQueryForNonexistentToken();
 error UnmatchedLength();
 error NoShares();
+error InvalidShareQuantity();
 
 /// @title ERC721 contract for https://heds.io/ HedsTape
 /// @author https://github.com/kadenzipfel
@@ -81,12 +82,17 @@ contract HedsTape is ERC721K, Ownable {
   function seedWithdrawalData(address[] calldata _addresses, uint64[] calldata _shares) external onlyOwner {
     if (_addresses.length != _shares.length) revert UnmatchedLength();
 
+    uint totalShares;
+
     // Overflow impossible
     unchecked {
       for (uint i = 0; i < _addresses.length; ++i) {
         withdrawalData[_addresses[i]].shareBps = _shares[i];
+        totalShares += _shares[i];
       }
     }
+
+    if (totalShares != 10000) revert InvalidShareQuantity();
   }
 
   /// @notice Withdraw shares
