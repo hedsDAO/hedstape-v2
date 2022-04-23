@@ -210,13 +210,16 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         _seedWithdrawalData();
 
         _beginSale();
-        hedsTape.mintHead{value: 0.3 ether}(3);
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        uint amount = 3;
+        uint valueToSend = uint(price) * amount;
+        hedsTape.mintHead{value: valueToSend}(amount);
 
         cheats.prank(address(1));
         uint balanceBefore = address(1).balance;
         hedsTape.withdrawShare();
         uint balanceAfter = address(1).balance;
-        assertEq(balanceAfter - balanceBefore, 0.03 ether);
+        assertEq(balanceAfter - balanceBefore, valueToSend / 10);
     }
 
     function testWithdrawShares(uint16 share, uint16 amount) public {
@@ -277,7 +280,10 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         _seedWithdrawalData();
 
         _beginSale();
-        hedsTape.mintHead{value: 0.3 ether}(3);
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        uint amount = 3;
+        uint valueToSend = uint(price) * amount;
+        hedsTape.mintHead{value: valueToSend}(amount);
 
         cheats.prank(address(5));
         cheats.expectRevert(abi.encodeWithSignature("NoShares()"));
@@ -288,7 +294,10 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         _seedWithdrawalData();
 
         _beginSale();
-        hedsTape.mintHead{value: 0.3 ether}(3);
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        uint amount = 3;
+        uint valueToSend = uint(price) * amount;
+        hedsTape.mintHead{value: valueToSend}(amount);
 
         uint balanceBefore = address(1).balance;
         cheats.prank(address(1));
@@ -298,67 +307,77 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         cheats.prank(address(1));
         hedsTape.withdrawShare();
         uint balanceAfter = address(1).balance;
-        assertEq(balanceAfter - balanceBefore, 0.03 ether);
+        assertEq(balanceAfter - balanceBefore, valueToSend / 10);
     }
 
     function testWithdrawAllShares() public {
         _seedWithdrawalData();
 
         _beginSale();
-        hedsTape.mintHead{value: 0.3 ether}(3);
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        uint amount = 3;
+        uint valueToSend = uint(price) * amount;
+        hedsTape.mintHead{value: valueToSend}(amount);
 
         cheats.prank(address(1));
         uint balanceBefore1 = address(1).balance;
         hedsTape.withdrawShare();
         uint balanceAfter1 = address(1).balance;
-        assertEq(balanceAfter1 - balanceBefore1, 0.03 ether);
+        assertEq(balanceAfter1 - balanceBefore1, valueToSend / 10);
 
         cheats.prank(address(2));
         uint balanceBefore2 = address(2).balance;
         hedsTape.withdrawShare();
         uint balanceAfter2 = address(2).balance;
-        assertEq(balanceAfter2 - balanceBefore2, 0.06 ether);
+        assertEq(balanceAfter2 - balanceBefore2, valueToSend / 10 * 2);
 
         cheats.prank(address(3));
         uint balanceBefore3 = address(3).balance;
         hedsTape.withdrawShare();
         uint balanceAfter3 = address(3).balance;
-        assertEq(balanceAfter3 - balanceBefore3, 0.09 ether);
+        assertEq(balanceAfter3 - balanceBefore3, valueToSend / 10 * 3);
 
         cheats.prank(address(4));
         uint balanceBefore4 = address(4).balance;
         hedsTape.withdrawShare();
         uint balanceAfter4 = address(4).balance;
-        assertEq(balanceAfter4 - balanceBefore4, 0.12 ether);
+        assertEq(balanceAfter4 - balanceBefore4, valueToSend / 10 * 4);
     }
 
     function testWithdrawMultipleTimes() public {
         _seedWithdrawalData();
 
         _beginSale();
-        hedsTape.mintHead{value: 0.3 ether}(3);
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        uint amount = 3;
+        uint valueToSend = uint(price) * amount;
+        hedsTape.mintHead{value: valueToSend}(amount);
 
         cheats.prank(address(1));
         uint balanceBefore = address(1).balance;
         hedsTape.withdrawShare();
         uint balanceAfter = address(1).balance;
-        assertEq(balanceAfter - balanceBefore, 0.03 ether);
+        assertEq(balanceAfter - balanceBefore, valueToSend / 10);
 
-        hedsTape.mintHead{value: 0.5 ether}(5);
+        uint amount2 = 5;
+        uint valueToSend2 = uint(price) * amount2;
+        hedsTape.mintHead{value: valueToSend2}(amount2);
 
         cheats.prank(address(1));
         uint balanceBefore1 = address(1).balance;
         hedsTape.withdrawShare();
         uint balanceAfter1 = address(1).balance;
-        assertEq(balanceAfter1 - balanceBefore1, 0.05 ether);
+        assertEq(balanceAfter1 - balanceBefore1, valueToSend2 / 10);
 
-        hedsTape.mintHead{value: 7.7 ether}(77);
+        uint amount3 = 77;
+        uint valueToSend3 = uint(price) * amount3;
+        hedsTape.mintHead{value: valueToSend3}(amount3);
 
         cheats.prank(address(1));
         uint balanceBefore2 = address(1).balance;
         hedsTape.withdrawShare();
         uint balanceAfter2 = address(1).balance;
-        assertEq(balanceAfter2 - balanceBefore2, 0.77 ether);
+        assertEq(balanceAfter2 - balanceBefore2, valueToSend3 / 10);
     }
 
     function testCannotNonWhitelistedMint() public {
