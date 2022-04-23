@@ -206,13 +206,14 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(balanceAfter - balanceBefore, 0.03 ether);
     }
 
-    function testFailWithdrawShareUnauthorized() public {
+    function testCannotWithdrawShareUnauthorized() public {
         _seedWithdrawalData();
 
         _beginSale();
         hedsTape.mintHead{value: 0.3 ether}(3);
 
         cheats.prank(address(5));
+        cheats.expectRevert(abi.encodeWithSignature("NoShares()"));
         hedsTape.withdrawShare();
     }
 
