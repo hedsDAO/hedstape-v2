@@ -294,9 +294,10 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(balanceAfter2 - balanceBefore2, 0.77 ether);
     }
 
-    function testFailNotWhitelistedMint() public {
+    function testCannotNonWhitelistedMint() public {
         _beginWhitelistSale();
         (uint64 price, , ,) = hedsTape.saleConfig();
+        cheats.expectRevert(abi.encodeWithSignature("ExceedsWhitelistAllowance()"));
         hedsTape.whitelistMintHead{value: price}(1);
     }
 
