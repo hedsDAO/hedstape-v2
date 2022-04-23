@@ -80,10 +80,11 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.mintHead{value: price - 1}(1);
     }
 
-    function testFailMintHeadsBeyondMaxSupply() public {
+    function testCannotMintHeadsBeyondMaxSupply() public {
         _beginSale();
         (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
         uint valueToSend = uint(price) * uint(maxSupply + 1);
+        cheats.expectRevert(abi.encodeWithSignature("ExceedsMaxSupply()"));
         hedsTape.mintHead{value: valueToSend}(maxSupply + 1);
     }
 
