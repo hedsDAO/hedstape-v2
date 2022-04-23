@@ -362,6 +362,42 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(balanceAfter4 - balanceBefore4, valueToSend / 10 * 4);
     }
 
+    function testWithdrawAllShares(uint16 amount) public {
+        _seedWithdrawalData();
+
+        _beginSale();
+        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
+        uint amountToMint = uint(amount);
+        if (amountToMint == 0) amountToMint = 1;
+        if (amountToMint > maxSupply) amountToMint = uint(maxSupply);
+        uint valueToSend = uint(price) * amountToMint;
+        hedsTape.mintHead{value: valueToSend}(amountToMint);
+
+        cheats.prank(address(1));
+        uint balanceBefore1 = address(1).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter1 = address(1).balance;
+        assertEq(balanceAfter1 - balanceBefore1, valueToSend / 10);
+
+        cheats.prank(address(2));
+        uint balanceBefore2 = address(2).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter2 = address(2).balance;
+        assertEq(balanceAfter2 - balanceBefore2, valueToSend / 10 * 2);
+
+        cheats.prank(address(3));
+        uint balanceBefore3 = address(3).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter3 = address(3).balance;
+        assertEq(balanceAfter3 - balanceBefore3, valueToSend / 10 * 3);
+
+        cheats.prank(address(4));
+        uint balanceBefore4 = address(4).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter4 = address(4).balance;
+        assertEq(balanceAfter4 - balanceBefore4, valueToSend / 10 * 4);
+    }
+
     function testWithdrawMultipleTimes() public {
         _seedWithdrawalData();
 
