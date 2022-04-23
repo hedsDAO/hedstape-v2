@@ -41,9 +41,11 @@ contract HedsTape is ERC721K, Ownable, ReentrancyGuard {
   /// @notice Remaining whitelist mints per address
   mapping(address => uint) public whitelist;
 
+  // TODO: Update baseUri
   string private baseUri = 'ipfs://QmcQ5JySJAZC1sj69HGChncXx2omact5wFYEoxCoYv6scx';
 
   constructor() ERC721K("hedsTAPE 3", "HT3") {
+    // TODO: Update all the sale config values
     saleConfig.price = 0.1 ether;
     saleConfig.maxSupply = 500;
     saleConfig.startTime = 1649530800;
