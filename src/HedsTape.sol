@@ -165,7 +165,8 @@ contract HedsTape is ERC721K, Ownable, ReentrancyGuard {
   }
 
   /// @notice Withdraw contract balance - must be contract owner
-  function withdraw() external onlyOwner {
+  /// NOTE: This will break withdrawShare() functionality, only use in emergency
+  function emergencyWithdraw() external onlyOwner {
     (bool success, ) = payable(msg.sender).call{value: address(this).balance}("");
     if (!success) revert FailedTransfer();
   }

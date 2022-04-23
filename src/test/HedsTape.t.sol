@@ -141,7 +141,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(address(hedsTape).balance, amount);
 
         uint balanceBefore = address(this).balance;
-        hedsTape.withdraw();
+        hedsTape.emergencyWithdraw();
         uint balanceAfter = address(this).balance;
 
         assertEq(balanceAfter - balanceBefore, amount);
@@ -150,7 +150,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     function testWithdrawNotOwner() public {
         cheats.expectRevert(bytes("Ownable: caller is not the owner"));
         cheats.prank(address(1));
-        hedsTape.withdraw();
+        hedsTape.emergencyWithdraw();
     }
 
     function testSeedWithdrawalData() public {
