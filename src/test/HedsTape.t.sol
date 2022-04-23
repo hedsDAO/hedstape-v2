@@ -186,9 +186,10 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.seedWithdrawalData(addresses, shares);
     }
 
-    function testFailSeedWithdrawalDataNotOwner() public {
+    function testCannotSeedWithdrawalDataNotOwner() public {
         cheats.prank(address(1));
 
+        cheats.expectRevert(bytes("Ownable: caller is not the owner"));
         _seedWithdrawalData();
     }
 
