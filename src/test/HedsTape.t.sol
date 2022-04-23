@@ -434,6 +434,48 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(balanceAfter2 - balanceBefore2, valueToSend3 / 10);
     }
 
+    function testWithdrawMultipleTimes(uint16 amount, uint16 amount2, uint16 amount3) public {
+        _seedWithdrawalData();
+
+        _beginSale();
+        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
+        uint amountToMint = uint(amount);
+        if (amountToMint == 0) amountToMint = 1;
+        if (amountToMint > maxSupply - 2) amountToMint = uint(maxSupply) - 2;
+        uint valueToSend = uint(price) * amountToMint;
+        hedsTape.mintHead{value: valueToSend}(amountToMint);
+
+        cheats.prank(address(1));
+        uint balanceBefore = address(1).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter = address(1).balance;
+        assertEq(balanceAfter - balanceBefore, valueToSend / 10);
+
+        uint amountToMint2 = uint(amount2);
+        if (amountToMint2 == 0) amountToMint2 = 1;
+        if (amountToMint + amountToMint2 > maxSupply - 1) amountToMint2 = (uint(maxSupply) - amountToMint) - 1;
+        uint valueToSend2 = uint(price) * amountToMint2;
+        hedsTape.mintHead{value: valueToSend2}(amountToMint2);
+
+        cheats.prank(address(1));
+        uint balanceBefore1 = address(1).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter1 = address(1).balance;
+        assertEq(balanceAfter1 - balanceBefore1, valueToSend2 / 10);
+
+        uint amountToMint3 = uint(amount3);
+        if (amountToMint3 == 0) amountToMint3 = 1;
+        if (amountToMint + amountToMint2 + amountToMint3 > maxSupply) amountToMint3 = uint(maxSupply) - amountToMint - amountToMint2;
+        uint valueToSend3 = uint(price) * amountToMint3;
+        hedsTape.mintHead{value: valueToSend3}(amountToMint3);
+
+        cheats.prank(address(1));
+        uint balanceBefore2 = address(1).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter2 = address(1).balance;
+        assertEq(balanceAfter2 - balanceBefore2, valueToSend3 / 10);
+    }
+
     function testCannotNonWhitelistedMint() public {
         _beginWhitelistSale();
         (uint64 price, , ,) = hedsTape.saleConfig();
