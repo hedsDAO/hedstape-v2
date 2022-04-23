@@ -4,6 +4,7 @@ pragma solidity 0.8.10;
 import "ds-test/test.sol";
 import "../HedsTape.sol";
 import "openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "./lib/PRBMath.sol";
 
 interface CheatCodes {
   function prank(address) external;
@@ -216,6 +217,60 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.withdrawShare();
         uint balanceAfter = address(1).balance;
         assertEq(balanceAfter - balanceBefore, 0.03 ether);
+    }
+
+    function testWithdrawShares(uint16 share, uint16 amount) public {
+        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
+
+        if (amount == 0) amount = 1;
+        if (amount > maxSupply) amount = uint16(maxSupply);
+        if (share == 0) share = 1;
+        uint firstShare = PRBMath.mulDiv(uint(share), 10000, type(uint16).max);
+        if (firstShare < 1) firstShare = 1;
+        uint secondShare = (10000 - firstShare) / 3;
+        uint thirdShare = 10000 - firstShare - secondShare;
+
+        addresses.push(address(1));
+        addresses.push(address(2));
+        addresses.push(address(3));
+        shares.push(uint64(firstShare));
+        shares.push(uint64(secondShare));
+        shares.push(uint64(thirdShare));
+        hedsTape.seedWithdrawalData(addresses, shares);
+
+        _beginSale();
+
+        uint valueToSend = uint(price) * uint(amount);
+
+        hedsTape.mintHead{value: valueToSend}(amount);
+
+        uint price256 = uint(price);
+        uint amount256 = uint(amount);
+
+        cheats.prank(address(1));
+        uint balanceBefore1 = address(1).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter1 = address(1).balance;
+        uint expected1 = uint(firstShare) * price256 * amount256 / 10000;
+        assertEq(balanceAfter1 - balanceBefore1, expected1);
+
+        if (secondShare != 0) {
+            cheats.prank(address(2));
+            uint balanceBefore2 = address(2).balance;
+            hedsTape.withdrawShare();
+            uint balanceAfter2 = address(2).balance;
+            uint expected2 = uint(secondShare) * price256 * amount256 / 10000;
+            assertEq(balanceAfter2 - balanceBefore2, expected2);
+        }
+
+        if (thirdShare != 0) {
+            cheats.prank(address(3));
+            uint balanceBefore3 = address(3).balance;
+            hedsTape.withdrawShare();
+            uint balanceAfter3 = address(3).balance;
+            uint expected3 = uint(thirdShare) * price256 * amount256 / 10000;
+            assertEq(balanceAfter3 - balanceBefore3, expected3);
+        }
     }
 
     function testCannotWithdrawShareUnauthorized() public {
