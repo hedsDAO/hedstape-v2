@@ -118,7 +118,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     address[] addresses;
     uint64[] shares;
 
-    function testSeedWithdrawalData() public {
+    function _seedWithdrawalData() internal {
         addresses.push(address(1));
         addresses.push(address(2));
         addresses.push(address(3));
@@ -129,6 +129,11 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         shares.push(4000);
 
         hedsTape.seedWithdrawalData(addresses, shares);
+    }
+
+    function testSeedWithdrawalData() public {
+        _seedWithdrawalData();
+
         (uint64 shareBps1, uint64 amtWithdrawn1) = hedsTape.withdrawalData(address(1));
         (uint64 shareBps2, uint64 amtWithdrawn2) = hedsTape.withdrawalData(address(2));
         (uint64 shareBps3, uint64 amtWithdrawn3) = hedsTape.withdrawalData(address(3));
@@ -160,29 +165,11 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     function testFailSeedWithdrawalDataNotOwner() public {
         cheats.prank(address(1));
 
-        addresses.push(address(1));
-        addresses.push(address(2));
-        addresses.push(address(3));
-        addresses.push(address(4));
-        shares.push(1000);
-        shares.push(2000);
-        shares.push(3000);
-        shares.push(4000);
-
-        hedsTape.seedWithdrawalData(addresses, shares);
+        _seedWithdrawalData();
     }
 
     function testWithdrawShare() public {
-        addresses.push(address(1));
-        addresses.push(address(2));
-        addresses.push(address(3));
-        addresses.push(address(4));
-        shares.push(1000);
-        shares.push(2000);
-        shares.push(3000);
-        shares.push(4000);
-
-        hedsTape.seedWithdrawalData(addresses, shares);
+        _seedWithdrawalData();
 
         hedsTape.updateStartTime(1650000000);
         cheats.warp(1650000000);
@@ -196,16 +183,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     }
 
     function testFailWithdrawShareUnauthorized() public {
-        addresses.push(address(1));
-        addresses.push(address(2));
-        addresses.push(address(3));
-        addresses.push(address(4));
-        shares.push(1000);
-        shares.push(2000);
-        shares.push(3000);
-        shares.push(4000);
-
-        hedsTape.seedWithdrawalData(addresses, shares);
+        _seedWithdrawalData();
 
         hedsTape.updateStartTime(1650000000);
         cheats.warp(1650000000);
@@ -216,16 +194,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     }
 
     function testCannotWithdrawExcessiveShare() public {
-        addresses.push(address(1));
-        addresses.push(address(2));
-        addresses.push(address(3));
-        addresses.push(address(4));
-        shares.push(1000);
-        shares.push(2000);
-        shares.push(3000);
-        shares.push(4000);
-
-        hedsTape.seedWithdrawalData(addresses, shares);
+        _seedWithdrawalData();
 
         hedsTape.updateStartTime(1650000000);
         cheats.warp(1650000000);
@@ -240,6 +209,38 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.withdrawShare();
         uint balanceAfter = address(1).balance;
         assertEq(balanceAfter - balanceBefore, 0.03 ether);
+    }
+
+    function testWithdrawAllShares() public {
+        _seedWithdrawalData();
+
+        hedsTape.updateStartTime(1650000000);
+        cheats.warp(1650000000);
+        hedsTape.mintHead{value: 0.3 ether}(3);
+
+        cheats.prank(address(1));
+        uint balanceBefore1 = address(1).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter1 = address(1).balance;
+        assertEq(balanceAfter1 - balanceBefore1, 0.03 ether);
+
+        cheats.prank(address(2));
+        uint balanceBefore2 = address(2).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter2 = address(2).balance;
+        assertEq(balanceAfter2 - balanceBefore2, 0.06 ether);
+
+        cheats.prank(address(3));
+        uint balanceBefore3 = address(3).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter3 = address(3).balance;
+        assertEq(balanceAfter3 - balanceBefore3, 0.09 ether);
+
+        cheats.prank(address(4));
+        uint balanceBefore4 = address(4).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter4 = address(4).balance;
+        assertEq(balanceAfter4 - balanceBefore4, 0.12 ether);
     }
 
     fallback() external payable {}
