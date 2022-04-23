@@ -258,6 +258,35 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(balanceAfter4 - balanceBefore4, 0.12 ether);
     }
 
+    function testWithdrawMultipleTimes() public {
+        _seedWithdrawalData();
+
+        _beginSale();
+        hedsTape.mintHead{value: 0.3 ether}(3);
+
+        cheats.prank(address(1));
+        uint balanceBefore = address(1).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter = address(1).balance;
+        assertEq(balanceAfter - balanceBefore, 0.03 ether);
+
+        hedsTape.mintHead{value: 0.5 ether}(5);
+
+        cheats.prank(address(1));
+        uint balanceBefore1 = address(1).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter1 = address(1).balance;
+        assertEq(balanceAfter1 - balanceBefore1, 0.05 ether);
+
+        hedsTape.mintHead{value: 7.7 ether}(77);
+
+        cheats.prank(address(1));
+        uint balanceBefore2 = address(1).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter2 = address(1).balance;
+        assertEq(balanceAfter2 - balanceBefore2, 0.77 ether);
+    }
+
     function testFailNotWhitelistedMint() public {
         _beginWhitelistSale();
         (uint64 price, , ,) = hedsTape.saleConfig();
