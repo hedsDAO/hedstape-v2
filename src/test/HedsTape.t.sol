@@ -24,6 +24,22 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape = new HedsTape();
     }
 
+    address[] addresses;
+    uint64[] shares;
+
+    function _seedWithdrawalData() internal {
+        addresses.push(address(1));
+        addresses.push(address(2));
+        addresses.push(address(3));
+        addresses.push(address(4));
+        shares.push(1000);
+        shares.push(2000);
+        shares.push(3000);
+        shares.push(4000);
+
+        hedsTape.seedWithdrawalData(addresses, shares);
+    }
+
     function testUpdateStartTimeAsOwner() public {
         hedsTape.updateStartTime(1650000000);
         (, , uint32 newStartTime) = hedsTape.saleConfig();
@@ -115,22 +131,6 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.withdraw();
     }
 
-    address[] addresses;
-    uint64[] shares;
-
-    function _seedWithdrawalData() internal {
-        addresses.push(address(1));
-        addresses.push(address(2));
-        addresses.push(address(3));
-        addresses.push(address(4));
-        shares.push(1000);
-        shares.push(2000);
-        shares.push(3000);
-        shares.push(4000);
-
-        hedsTape.seedWithdrawalData(addresses, shares);
-    }
-
     function testSeedWithdrawalData() public {
         _seedWithdrawalData();
 
@@ -149,7 +149,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(amtWithdrawn4, 0);
     }
 
-    function testFailSeedWithdrawalDataIncorrectly() public {
+    function testFailSeedWithdrawalDataTooManyShares() public {
         addresses.push(address(1));
         addresses.push(address(2));
         addresses.push(address(3));
@@ -158,6 +158,19 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         shares.push(2000);
         shares.push(3000);
         shares.push(4001);
+
+        hedsTape.seedWithdrawalData(addresses, shares);
+    }
+
+    function testFailSeedWithdrawalDataTooFewShares() public {
+        addresses.push(address(1));
+        addresses.push(address(2));
+        addresses.push(address(3));
+        addresses.push(address(4));
+        shares.push(1000);
+        shares.push(2000);
+        shares.push(3000);
+        shares.push(3999);
 
         hedsTape.seedWithdrawalData(addresses, shares);
     }
