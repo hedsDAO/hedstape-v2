@@ -26,6 +26,8 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
     address[] addresses;
     uint64[] shares;
+    address[] whitelistAddresses;
+    uint[] mints;
 
     function _seedWithdrawalData() internal {
         addresses.push(address(1));
@@ -42,6 +44,11 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
     function _beginSale() internal {
         hedsTape.updateStartTime(1650000000);
+        cheats.warp(1650000000);
+    }
+
+    function _beginWhitelistSale() internal {
+        hedsTape.updateWhitelistStartTime(1650000000);
         cheats.warp(1650000000);
     }
 
@@ -252,14 +259,10 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     }
 
     function testFailNotWhitelistedMint() public {
-        hedsTape.updateWhitelistStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginWhitelistSale();
         (uint64 price, , ,) = hedsTape.saleConfig();
         hedsTape.whitelistMintHead{value: price}(1);
     }
-
-    address[] whitelistAddresses;
-    uint[] mints;
 
     function testSeedWhitelist() public {
         whitelistAddresses.push(address(1));
@@ -278,8 +281,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     }
 
     function testFailExcessiveWhitelistMint() public {
-        hedsTape.updateWhitelistStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginWhitelistSale();
         whitelistAddresses.push(0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84);
         mints.push(5);
         hedsTape.seedWhitelist(whitelistAddresses, mints);
@@ -299,8 +301,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     }
 
     function testWhitelistMint() public {
-        hedsTape.updateWhitelistStartTime(1650000000);
-        cheats.warp(1650000000);
+        _beginWhitelistSale();
         whitelistAddresses.push(0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84);
         mints.push(5);
         hedsTape.seedWhitelist(whitelistAddresses, mints);
