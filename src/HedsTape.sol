@@ -106,7 +106,7 @@ contract HedsTape is ERC721K, Ownable {
     uint _amtWithdrawn = uint(data.amtWithdrawn);
     uint withdrawalAmt = _currentIndex - 1 - _amtWithdrawn;
 
-    withdrawalData[msg.sender].amtWithdrawn = _currentIndex - 1;
+    withdrawalData[msg.sender].amtWithdrawn = uint64(_currentIndex - 1);
 
     uint amount = (withdrawalAmt * _shareBps * _price) / 10000;
 
