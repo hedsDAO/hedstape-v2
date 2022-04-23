@@ -222,6 +222,24 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(balanceAfter - balanceBefore, valueToSend / 10);
     }
 
+    function testWithdrawShare(uint16 amount) public {
+        _seedWithdrawalData();
+
+        _beginSale();
+        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
+        uint amountToMint = uint(amount);
+        if (amountToMint == 0) amountToMint = 1;
+        if (amountToMint > maxSupply) amountToMint = uint(maxSupply);
+        uint valueToSend = uint(price) * amountToMint;
+        hedsTape.mintHead{value: valueToSend}(amountToMint);
+
+        cheats.prank(address(1));
+        uint balanceBefore = address(1).balance;
+        hedsTape.withdrawShare();
+        uint balanceAfter = address(1).balance;
+        assertEq(balanceAfter - balanceBefore, valueToSend / 10);
+    }
+
     function testWithdrawShares(uint16 share, uint16 amount) public {
         (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
 
