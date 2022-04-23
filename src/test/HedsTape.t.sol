@@ -7,8 +7,8 @@ import "openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 interface CheatCodes {
   function prank(address) external;
-  function expectRevert(bytes calldata) external;
   function expectRevert(bytes4) external;
+  function expectRevert(bytes memory) external;
   function warp(uint256) external;
 }
 
@@ -65,10 +65,11 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.updateStartTime(1650000000);
     }
 
-    function testFailMintHeadBeforeStartTime() public {
+    function testCannotMintHeadBeforeStartTime() public {
         hedsTape.updateStartTime(1650000000);
         cheats.warp(1649999999);
         (uint64 price, , ,) = hedsTape.saleConfig();
+        cheats.expectRevert(abi.encodeWithSignature("BeforeSaleStart()"));
         hedsTape.mintHead{value: price}(1);
     }
 
