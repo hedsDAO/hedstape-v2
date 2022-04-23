@@ -144,6 +144,19 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(amtWithdrawn4, 0);
     }
 
+    function testFailSeedWithdrawalDataIncorrectly() public {
+        addresses.push(address(1));
+        addresses.push(address(2));
+        addresses.push(address(3));
+        addresses.push(address(4));
+        shares.push(1000);
+        shares.push(2000);
+        shares.push(3000);
+        shares.push(4001);
+
+        hedsTape.seedWithdrawalData(addresses, shares);
+    }
+
     fallback() external payable {}
     receive() external payable {}
 }
