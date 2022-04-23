@@ -317,13 +317,14 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(availableMints3, 15);
     }
 
-    function testFailExcessiveWhitelistMint() public {
+    function testCannotExcessiveWhitelistMint() public {
         _beginWhitelistSale();
         whitelistAddresses.push(0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84);
         mints.push(5);
         hedsTape.seedWhitelist(whitelistAddresses, mints);
         (uint64 price, , ,) = hedsTape.saleConfig();
         uint amount = uint(price) * 6;
+        cheats.expectRevert(abi.encodeWithSignature("ExceedsWhitelistAllowance()"));
         hedsTape.whitelistMintHead{value: amount}(6);
     }
 
