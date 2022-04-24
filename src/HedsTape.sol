@@ -75,7 +75,7 @@ contract HedsTape is ERC721K, Ownable {
     uint _whitelistStartTime = uint(config.whitelistStartTime);
 
     if (_amount * _price != msg.value) revert InsufficientFunds();
-    if (_currentIndex + _amount > _maxSupply) revert ExceedsMaxSupply();
+    if (_currentIndex + _amount > _maxSupply + 1) revert ExceedsMaxSupply();
     if (block.timestamp < _whitelistStartTime) revert BeforeSaleStart();
     if (_amount > whitelist[msg.sender]) revert ExceedsWhitelistAllowance();
 
