@@ -3,7 +3,6 @@ pragma solidity 0.8.10;
 
 import "ERC721K/ERC721K.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
-import "solmate/utils/ReentrancyGuard.sol";
 
 error InsufficientFunds();
 error ExceedsMaxSupply();
@@ -17,7 +16,7 @@ error ExceedsWhitelistAllowance();
 
 /// @title ERC721 contract for https://heds.io/ HedsTape
 /// @author https://github.com/kadenzipfel
-contract HedsTape is ERC721K, Ownable, ReentrancyGuard {
+contract HedsTape is ERC721K, Ownable {
   struct SaleConfig {
     uint64 price;
     uint32 maxSupply;
@@ -68,9 +67,8 @@ contract HedsTape is ERC721K, Ownable, ReentrancyGuard {
   }
 
   /// @notice Mint a HedsTape as a whitelisted individual
-  /// @dev Must use reentrancy guard to prevent onERC721Received callback reentrancy
   /// @param _amount Number of tokens to mint
-  function whitelistMintHead(uint _amount) external payable nonReentrant {
+  function whitelistMintHead(uint _amount) external payable {
     SaleConfig memory config = saleConfig;
     uint _price = uint(config.price);
     uint _maxSupply = uint(config.maxSupply);
