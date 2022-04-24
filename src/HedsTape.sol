@@ -148,10 +148,10 @@ contract HedsTape is ERC721K, Ownable {
   /// @dev Withdraw shares based on withdrawal data to msg.sender
   function withdrawShare() external {
     WithdrawalData memory data = withdrawalData[msg.sender];
-    if (data.shareBps == 0) revert NoShares();
+    uint _shareBps = uint(data.shareBps);
+    if (_shareBps == 0) revert NoShares();
 
     uint _price = uint(saleConfig.price);
-    uint _shareBps = uint(data.shareBps);
     uint _amtWithdrawn = uint(data.amtWithdrawn);
     uint withdrawalAmt = _currentIndex - 1 - _amtWithdrawn;
 
