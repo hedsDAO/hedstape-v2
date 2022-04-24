@@ -6,7 +6,7 @@
   - [ ] Remove corresponding todo comment
 - [ ] Set all saleConfig values (in constructor)
   - [ ] Remove corresponding todo comment
-- [ ] Create release once previous steps complete
+- [ ] Create release once previous steps complete (Kaden)
 
 ### Todo after deployment:
 
