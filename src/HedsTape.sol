@@ -132,11 +132,12 @@ contract HedsTape is ERC721K, Ownable {
 
     uint totalShares;
 
-    // Overflow impossible
-    unchecked {
-      for (uint i = 0; i < _addresses.length; ++i) {
-        withdrawalData[_addresses[i]].shareBps = _shares[i];
-        totalShares += _shares[i];
+    for (uint i = 0; i < _addresses.length;) {
+      withdrawalData[_addresses[i]].shareBps = _shares[i];
+      totalShares += _shares[i];
+      
+      unchecked {
+        ++i;
       }
     }
 
