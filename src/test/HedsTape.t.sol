@@ -21,8 +21,16 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         return this.onERC721Received.selector;
     }
 
+    address[] largeWhitelist;
+    uint256[] largeWhitelistMints;
+
     function setUp() public {
         hedsTape = new HedsTape();
+
+        for (uint i = 0; i < 1000; i++) {
+            largeWhitelist.push(address(1));
+            largeWhitelistMints.push(1);
+        }
     }
 
     address[] addresses;
@@ -542,6 +550,10 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         (uint64 price, , ,) = hedsTape.saleConfig();
         uint amount = uint(price) * 5;
         hedsTape.whitelistMintHead{value: amount}(5);
+    }
+
+    function testSeedLargeWhitelist() public {
+        hedsTape.seedWhitelist(largeWhitelist, largeWhitelistMints);
     }
 
     fallback() external payable {}
