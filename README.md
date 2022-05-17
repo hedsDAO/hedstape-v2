@@ -6,6 +6,7 @@
   - [ ] Remove corresponding todo comment
 - [ ] Set startTime
   - [ ] Remove corresponding todo comment
+- [ ] Implement 0xSplits as withdrawal address and test with mainnet forking (Kaden)
 - [ ] Create release once previous steps complete (Kaden)
 
 ### Todo after deployment:
