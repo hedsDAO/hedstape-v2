@@ -29,9 +29,9 @@ contract HedsTape is ERC721K, Ownable {
   string private baseUri = 'ipfs://QmcQ5JySJAZC1sj69HGChncXx2omact5wFYEoxCoYv6scx';
 
   constructor() ERC721K("hedsTAPE 4", "HT4") {
-    // TODO: Update all the sale config values
     saleConfig.price = 0.1 ether;
-    saleConfig.maxSupply = 500;
+    saleConfig.maxSupply = 150;
+    // TODO: Update startTime
     saleConfig.startTime = 1649530800;
   }
 
