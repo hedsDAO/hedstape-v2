@@ -21,36 +21,18 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         return this.onERC721Received.selector;
     }
 
-    address[] largeWhitelist;
-    uint256[] largeWhitelistMints;
-
     function setUp() public {
         hedsTape = new HedsTape();
-
-        for (uint i = 0; i < 1000; i++) {
-            largeWhitelist.push(address(1));
-            largeWhitelistMints.push(1);
-        }
     }
-
-    address[] addresses;
-    uint64[] shares;
-    address[] whitelistAddresses;
-    uint[] mints;
 
     function _beginSale() internal {
         hedsTape.updateStartTime(1650000000);
         cheats.warp(1650000000);
     }
 
-    function _beginWhitelistSale() internal {
-        hedsTape.updateWhitelistStartTime(1650000000);
-        cheats.warp(1650000000);
-    }
-
     function testUpdateStartTimeAsOwner() public {
         hedsTape.updateStartTime(1650000000);
-        (, , uint32 newStartTime, ) = hedsTape.saleConfig();
+        (, , uint32 newStartTime) = hedsTape.saleConfig();
 
         assertEq(newStartTime, 1650000000);
     }
@@ -64,21 +46,21 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     function testCannotMintHeadBeforeStartTime() public {
         hedsTape.updateStartTime(1650000000);
         cheats.warp(1649999999);
-        (uint64 price, , ,) = hedsTape.saleConfig();
+        (uint64 price, ,) = hedsTape.saleConfig();
         cheats.expectRevert(abi.encodeWithSignature("BeforeSaleStart()"));
         hedsTape.mintHead{value: price}(1);
     }
 
     function testCannotMintHeadInsufficientFunds() public {
         _beginSale();
-        (uint64 price, , ,) = hedsTape.saleConfig();
+        (uint64 price, ,) = hedsTape.saleConfig();
         cheats.expectRevert(abi.encodeWithSignature("InsufficientFunds()"));
         hedsTape.mintHead{value: price - 1}(1);
     }
 
     function testCannotMintHeadsBeyondMaxSupply() public {
         _beginSale();
-        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
+        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
         uint valueToSend = uint(price) * uint(maxSupply + 1);
         cheats.expectRevert(abi.encodeWithSignature("ExceedsMaxSupply()"));
         hedsTape.mintHead{value: valueToSend}(maxSupply + 1);
@@ -86,12 +68,12 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
     function testMintHead() public {
         _beginSale();
-        (uint64 price, , ,) = hedsTape.saleConfig();
+        (uint64 price, ,) = hedsTape.saleConfig();
         hedsTape.mintHead{value: price}(1);
     }
 
     function testMintHeads(uint16 amount) public {
-        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
+        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
         if (amount > maxSupply) amount = uint16(maxSupply);
         if (amount == 0) amount = 1;
 
@@ -104,7 +86,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
     function testMintHeadsUpToMaxSupply() public {
         _beginSale();
-        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
+        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
         uint valueToSend = uint(price) * uint(maxSupply);
         hedsTape.mintHead{value: valueToSend}(maxSupply);
     }
@@ -113,7 +95,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.setBaseUri("ipfs://sup");
 
         _beginSale();
-        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
+        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
         uint valueToSend = uint(price) * uint(maxSupply);
         hedsTape.mintHead{value: valueToSend}(maxSupply);
 
@@ -129,7 +111,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
     function testWithdraw() public {
         _beginSale();
-        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
+        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
         uint amount = uint(price) * uint(maxSupply);
         hedsTape.mintHead{value: amount}(maxSupply);
 
@@ -146,78 +128,6 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         cheats.expectRevert(bytes("Ownable: caller is not the owner"));
         cheats.prank(address(1));
         hedsTape.withdraw();
-    }
-
-    function testCannotNonWhitelistedMint() public {
-        _beginWhitelistSale();
-        (uint64 price, , ,) = hedsTape.saleConfig();
-        cheats.expectRevert(abi.encodeWithSignature("ExceedsWhitelistAllowance()"));
-        hedsTape.whitelistMintHead{value: price}(1);
-    }
-
-    function testSeedWhitelist() public {
-        whitelistAddresses.push(address(1));
-        whitelistAddresses.push(address(2));
-        whitelistAddresses.push(address(3));
-        mints.push(5);
-        mints.push(10);
-        mints.push(15);
-        hedsTape.seedWhitelist(whitelistAddresses, mints);
-        uint availableMints1 = hedsTape.whitelist(address(1));
-        assertEq(availableMints1, 5);
-        uint availableMints2 = hedsTape.whitelist(address(2));
-        assertEq(availableMints2, 10);
-        uint availableMints3 = hedsTape.whitelist(address(3));
-        assertEq(availableMints3, 15);
-    }
-
-    function testCannotExcessiveWhitelistMint() public {
-        _beginWhitelistSale();
-        whitelistAddresses.push(address(this));
-        mints.push(5);
-        hedsTape.seedWhitelist(whitelistAddresses, mints);
-        (uint64 price, , ,) = hedsTape.saleConfig();
-        uint amount = uint(price) * 6;
-        cheats.expectRevert(abi.encodeWithSignature("ExceedsWhitelistAllowance()"));
-        hedsTape.whitelistMintHead{value: amount}(6);
-    }
-
-    function testCannotExcessiveWhitelistMintSeparateTx() public {
-        _beginWhitelistSale();
-        whitelistAddresses.push(address(this));
-        mints.push(5);
-        hedsTape.seedWhitelist(whitelistAddresses, mints);
-        (uint64 price, , ,) = hedsTape.saleConfig();
-        uint amount = uint(price) * 5;
-        hedsTape.whitelistMintHead{value: amount}(5);
-
-        cheats.expectRevert(abi.encodeWithSignature("ExceedsWhitelistAllowance()"));
-        hedsTape.whitelistMintHead{value: price}(1);
-    }
-
-    function testCannotWhitelistMintHeadBeforeStartTime() public {
-        hedsTape.updateWhitelistStartTime(1650000000);
-        cheats.warp(1649999999);
-        whitelistAddresses.push(address(this));
-        mints.push(5);
-        hedsTape.seedWhitelist(whitelistAddresses, mints);
-        (uint64 price, , ,) = hedsTape.saleConfig();
-        cheats.expectRevert(abi.encodeWithSignature("BeforeSaleStart()"));
-        hedsTape.whitelistMintHead{value: price}(1);
-    }
-
-    function testWhitelistMint() public {
-        _beginWhitelistSale();
-        whitelistAddresses.push(address(this));
-        mints.push(5);
-        hedsTape.seedWhitelist(whitelistAddresses, mints);
-        (uint64 price, , ,) = hedsTape.saleConfig();
-        uint amount = uint(price) * 5;
-        hedsTape.whitelistMintHead{value: amount}(5);
-    }
-
-    function testSeedLargeWhitelist() public {
-        hedsTape.seedWhitelist(largeWhitelist, largeWhitelistMints);
     }
 
     fallback() external payable {}
