@@ -24,18 +24,9 @@ contract HedsTape is ERC721K, Ownable {
     uint32 whitelistStartTime;
   }
 
-  struct WithdrawalData {
-    uint64 shareBps;
-    uint64 amtWithdrawn;
-  }
-
   /// @notice NFT sale data
   /// @dev Sale data packed into single storage slot
   SaleConfig public saleConfig;
-
-  /// @notice Withdrawal data
-  /// @dev Withdrawal data packed into single storage slot
-  mapping(address => WithdrawalData) public withdrawalData;
 
   /// @notice Remaining whitelist mints per address
   mapping(address => uint) public whitelist;
@@ -123,49 +114,8 @@ contract HedsTape is ERC721K, Ownable {
     saleConfig.whitelistStartTime = _whitelistStartTime;
   }
 
-  /// @notice Seed withdrawal data - must be contract owner, shares MUST sum to 10000
-  /// @dev Each call will overwrite previous data
-  /// @param _addresses array of addresses to seed withdrawal data for
-  /// @param _shares array of shareBps corresponding to addresses
-  function seedWithdrawalData(address[] calldata _addresses, uint64[] calldata _shares) external onlyOwner {
-    if (_addresses.length != _shares.length) revert UnmatchedLength();
-
-    uint totalShares;
-
-    for (uint i = 0; i < _addresses.length;) {
-      withdrawalData[_addresses[i]].shareBps = _shares[i];
-      totalShares += _shares[i];
-      
-      unchecked {
-        ++i;
-      }
-    }
-
-    if (totalShares != 10000) revert InvalidShareQuantity();
-  }
-
-  /// @notice Withdraw shares
-  /// @dev Withdraw shares based on withdrawal data to msg.sender
-  function withdrawShare() external {
-    WithdrawalData memory data = withdrawalData[msg.sender];
-    uint _shareBps = uint(data.shareBps);
-    if (_shareBps == 0) revert NoShares();
-
-    uint _price = uint(saleConfig.price);
-    uint _amtWithdrawn = uint(data.amtWithdrawn);
-    uint withdrawalAmt = _currentIndex - 1 - _amtWithdrawn;
-
-    withdrawalData[msg.sender].amtWithdrawn = uint64(_currentIndex - 1);
-
-    uint amount = (withdrawalAmt * _shareBps * _price) / 10000;
-
-    (bool success, ) = payable(msg.sender).call{value: amount}("");
-    if (!success) revert FailedTransfer();
-  }
-
   /// @notice Withdraw contract balance - must be contract owner
-  /// NOTE: This will break withdrawShare() functionality, only use in emergency
-  function emergencyWithdraw() external onlyOwner {
+  function withdraw() external onlyOwner {
     (bool success, ) = payable(msg.sender).call{value: address(this).balance}("");
     if (!success) revert FailedTransfer();
   }
