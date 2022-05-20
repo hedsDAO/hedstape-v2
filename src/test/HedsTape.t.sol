@@ -17,6 +17,8 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     CheatCodes cheats = CheatCodes(HEVM_ADDRESS);
     HedsTape hedsTape;
 
+    address zeroXSplit = 0x3058435589213f59e8653D1410508bCd3F7a4DfD;
+
     function onERC721Received(address, address, uint256, bytes memory) public virtual override returns(bytes4) {
         return this.onERC721Received.selector;
     }
@@ -117,9 +119,9 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
         assertEq(address(hedsTape).balance, amount);
 
-        uint balanceBefore = address(this).balance;
+        uint balanceBefore = address(zeroXSplit).balance;
         hedsTape.withdraw();
-        uint balanceAfter = address(this).balance;
+        uint balanceAfter = address(zeroXSplit).balance;
 
         assertEq(balanceAfter - balanceBefore, amount);
     }

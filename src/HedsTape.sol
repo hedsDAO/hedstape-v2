@@ -28,6 +28,8 @@ contract HedsTape is ERC721K, Ownable {
   // TODO: Update baseUri
   string private baseUri = 'ipfs://QmcQ5JySJAZC1sj69HGChncXx2omact5wFYEoxCoYv6scx';
 
+  address private zeroXSplit = 0x3058435589213f59e8653D1410508bCd3F7a4DfD;
+
   constructor() ERC721K("hedsTAPE 4", "HT4") {
     saleConfig.price = 0.1 ether;
     saleConfig.maxSupply = 150;
@@ -69,7 +71,7 @@ contract HedsTape is ERC721K, Ownable {
 
   /// @notice Withdraw contract balance - must be contract owner
   function withdraw() external onlyOwner {
-    (bool success, ) = payable(msg.sender).call{value: address(this).balance}("");
+    (bool success, ) = payable(zeroXSplit).call{value: address(this).balance}("");
     if (!success) revert FailedTransfer();
   }
 }
