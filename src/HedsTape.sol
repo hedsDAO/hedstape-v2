@@ -6,7 +6,7 @@ import "openzeppelin-contracts/contracts/access/Ownable.sol";
 
 error InsufficientFunds();
 error ExceedsMaxSupply();
-error BeforeSaleStart();
+error OutsideSalePeriod();
 error FailedTransfer();
 error URIQueryForNonexistentToken();
 error UnmatchedLength();
@@ -19,6 +19,7 @@ contract HedsTape is ERC721K, Ownable {
     uint64 price;
     uint32 maxSupply;
     uint32 startTime;
+    uint32 endTime;
   }
 
   /// @notice NFT sale data
@@ -38,6 +39,8 @@ contract HedsTape is ERC721K, Ownable {
     saleConfig.maxSupply = 150;
     // TODO: Update startTime
     saleConfig.startTime = 1653159600;
+    // TODO: Update endTime
+    saleConfig.endTime = 1653159600;
   }
 
   /// @notice Mint a HedsTape token
@@ -47,10 +50,11 @@ contract HedsTape is ERC721K, Ownable {
     uint _price = uint(config.price);
     uint _maxSupply = uint(config.maxSupply);
     uint _startTime = uint(config.startTime);
+    uint _endTime = uint(config.endTime);
 
     if (_amount * _price != msg.value) revert InsufficientFunds();
     if (_currentIndex + _amount > _maxSupply + 1) revert ExceedsMaxSupply();
-    if (block.timestamp < _startTime) revert BeforeSaleStart();
+    if (block.timestamp < _startTime || block.timestamp > _endTime) revert OutsideSalePeriod();
 
     _safeMint(msg.sender, _amount);
   }
@@ -70,6 +74,11 @@ contract HedsTape is ERC721K, Ownable {
   /// @notice Update sale start time - must be contract owner
   function updateStartTime(uint32 _startTime) external onlyOwner {
     saleConfig.startTime = _startTime;
+  }
+
+  /// @notice Update sale end time - must be contract owner
+  function updateEndTime(uint32 _endTime) external onlyOwner {
+    saleConfig.endTime = _endTime;
   }
 
   /// @notice Update max supply - must be contract owner

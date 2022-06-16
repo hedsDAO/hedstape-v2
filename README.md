@@ -6,6 +6,8 @@
   - [ ] Remove corresponding todo comment
 - [ ] Update startTime
   - [ ] Remove corresponding todo comment
+- [ ] Update endTime
+  - [ ] Remove corresponding todo comment
 - [ ] Update 0xsplit address
   - [ ] Remove corresponding todo comment
 - [ ] Update price

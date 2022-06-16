@@ -29,12 +29,13 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
     function _beginSale() internal {
         hedsTape.updateStartTime(1650000000);
+        hedsTape.updateEndTime(1650005000);
         cheats.warp(1650000000);
     }
 
     function testUpdateStartTimeAsOwner() public {
         hedsTape.updateStartTime(1650000000);
-        (, , uint32 newStartTime) = hedsTape.saleConfig();
+        (, , uint32 newStartTime, ) = hedsTape.saleConfig();
 
         assertEq(newStartTime, 1650000000);
     }
@@ -45,17 +46,38 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.updateStartTime(1650000000);
     }
 
+    function testUpdateEndTimeAsOwner() public {
+        hedsTape.updateEndTime(1650000000);
+        (, , , uint32 newEndTime) = hedsTape.saleConfig();
+
+        assertEq(newEndTime, 1650000000);
+    }
+
+    function testCannotUpdateEndTimeAsNotOwner() public {
+        cheats.expectRevert(bytes("Ownable: caller is not the owner"));
+        cheats.prank(address(0));
+        hedsTape.updateEndTime(1650000000);
+    }
+
     function testCannotMintHeadBeforeStartTime() public {
         hedsTape.updateStartTime(1650000000);
         cheats.warp(1649999999);
-        (uint64 price, ,) = hedsTape.saleConfig();
-        cheats.expectRevert(abi.encodeWithSignature("BeforeSaleStart()"));
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        cheats.expectRevert(abi.encodeWithSignature("OutsideSalePeriod()"));
+        hedsTape.mintHead{value: price}(1);
+    }
+
+    function testCannotMintHeadAfterEndTime() public {
+        hedsTape.updateEndTime(2650000000);
+        cheats.warp(2650000001);
+        (uint64 price, , ,) = hedsTape.saleConfig();
+        cheats.expectRevert(abi.encodeWithSignature("OutsideSalePeriod()"));
         hedsTape.mintHead{value: price}(1);
     }
 
     function testUpdateMaxSupplyAsOwner() public {
         hedsTape.updateMaxSupply(200);
-        (, uint32 newMaxSupply, ) = hedsTape.saleConfig();
+        (, uint32 newMaxSupply, ,) = hedsTape.saleConfig();
 
         assertEq(newMaxSupply, 200);
     }
@@ -68,14 +90,14 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
     function testCannotMintHeadInsufficientFunds() public {
         _beginSale();
-        (uint64 price, ,) = hedsTape.saleConfig();
+        (uint64 price, , ,) = hedsTape.saleConfig();
         cheats.expectRevert(abi.encodeWithSignature("InsufficientFunds()"));
         hedsTape.mintHead{value: price - 1}(1);
     }
 
     function testCannotMintHeadsBeyondMaxSupply() public {
         _beginSale();
-        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
+        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
         uint valueToSend = uint(price) * uint(maxSupply + 1);
         cheats.expectRevert(abi.encodeWithSignature("ExceedsMaxSupply()"));
         hedsTape.mintHead{value: valueToSend}(maxSupply + 1);
@@ -83,12 +105,12 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
     function testMintHead() public {
         _beginSale();
-        (uint64 price, ,) = hedsTape.saleConfig();
+        (uint64 price, , ,) = hedsTape.saleConfig();
         hedsTape.mintHead{value: price}(1);
     }
 
     function testMintHeads(uint16 amount) public {
-        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
+        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
         if (amount > maxSupply) amount = uint16(maxSupply);
         if (amount == 0) amount = 1;
 
@@ -101,7 +123,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
     function testMintHeadsUpToMaxSupply() public {
         _beginSale();
-        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
+        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
         uint valueToSend = uint(price) * uint(maxSupply);
         hedsTape.mintHead{value: valueToSend}(maxSupply);
     }
@@ -110,7 +132,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         hedsTape.setBaseUri("ipfs://sup");
 
         _beginSale();
-        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
+        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
         uint valueToSend = uint(price) * uint(maxSupply);
         hedsTape.mintHead{value: valueToSend}(maxSupply);
 
@@ -126,7 +148,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
 
     function testWithdraw() public {
         _beginSale();
-        (uint64 price, uint32 maxSupply,) = hedsTape.saleConfig();
+        (uint64 price, uint32 maxSupply, ,) = hedsTape.saleConfig();
         uint amount = uint(price) * uint(maxSupply);
         hedsTape.mintHead{value: amount}(maxSupply);
 
