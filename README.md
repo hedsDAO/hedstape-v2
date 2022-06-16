@@ -1,13 +1,18 @@
-# HedsTape 04
+# HedsTape 05
 
 ### Todo before deployment:
 
-- [x] Set baseUri
-  - [x] Remove corresponding todo comment
-- [x] Set startTime
-  - [x] Remove corresponding todo comment
-- [x] Implement 0xSplits as withdrawal address and test with mainnet forking (Kaden)
-- [x] Create release once previous steps complete (Kaden)
+- [ ] Update baseUri
+  - [ ] Remove corresponding todo comment
+- [ ] Update startTime
+  - [ ] Remove corresponding todo comment
+- [ ] Update 0xsplit address
+  - [ ] Remove corresponding todo comment
+- [ ] Update price
+  - [ ] Remove corresponding todo comment
+- [ ] Update maxSupply
+  - [ ] Remove corresponding todo comment
+- [ ] Create release once previous steps complete (Kaden)
 
 ### Todo after deployment:
 
