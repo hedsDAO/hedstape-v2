@@ -72,6 +72,11 @@ contract HedsTape is ERC721K, Ownable {
     saleConfig.startTime = _startTime;
   }
 
+  /// @notice Update max supply - must be contract owner
+  function updateMaxSupply(uint32 _maxSupply) external onlyOwner {
+    saleConfig.maxSupply = _maxSupply;
+  }
+
   /// @notice Withdraw contract balance - must be contract owner
   function withdraw() external onlyOwner {
     (bool success, ) = payable(zeroXSplit).call{value: address(this).balance}("");

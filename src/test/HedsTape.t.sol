@@ -39,7 +39,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(newStartTime, 1650000000);
     }
 
-    function testUpdateStartTimeAsNotOwner() public {
+    function testCannotUpdateStartTimeAsNotOwner() public {
         cheats.expectRevert(bytes("Ownable: caller is not the owner"));
         cheats.prank(address(0));
         hedsTape.updateStartTime(1650000000);
@@ -51,6 +51,19 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         (uint64 price, ,) = hedsTape.saleConfig();
         cheats.expectRevert(abi.encodeWithSignature("BeforeSaleStart()"));
         hedsTape.mintHead{value: price}(1);
+    }
+
+    function testUpdateMaxSupplyAsOwner() public {
+        hedsTape.updateMaxSupply(200);
+        (, uint32 newMaxSupply, ) = hedsTape.saleConfig();
+
+        assertEq(newMaxSupply, 200);
+    }
+
+    function testCannotUpdateMaxSupplyAsNotOwner() public {
+        cheats.expectRevert(bytes("Ownable: caller is not the owner"));
+        cheats.prank(address(0));
+        hedsTape.updateMaxSupply(200);
     }
 
     function testCannotMintHeadInsufficientFunds() public {
@@ -105,7 +118,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(uri, "ipfs://sup");
     }
 
-    function testSetBaseUriNotOwner() public {
+    function testCannotSetBaseUriNotOwner() public {
         cheats.expectRevert(bytes("Ownable: caller is not the owner"));
         cheats.prank(address(1));
         hedsTape.setBaseUri("ipfs://sup");
@@ -126,7 +139,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
         assertEq(balanceAfter - balanceBefore, amount);
     }
 
-    function testWithdrawNotOwner() public {
+    function testCannotWithdrawNotOwner() public {
         cheats.expectRevert(bytes("Ownable: caller is not the owner"));
         cheats.prank(address(1));
         hedsTape.withdraw();
