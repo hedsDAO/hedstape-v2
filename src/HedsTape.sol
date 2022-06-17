@@ -26,21 +26,15 @@ contract HedsTape is ERC721K, Ownable {
   /// @dev Sale data packed into single storage slot
   SaleConfig public saleConfig;
 
-  // TODO: Update baseUri
-  string private baseUri = 'ipfs://QmTa6Qi4guwave4nhWkVkwhkb2UEACnbJF2hyGVZ76o5kS';
+  string private baseUri = 'ipfs://QmZWBTAuT16cKxWF6MPQRGosYrJBTT3QZjjoLbZV5HYLgC';
 
-  // TODO: Update 0xsplit contract
-  address private zeroXSplit = 0x3058435589213f59e8653D1410508bCd3F7a4DfD;
+  address private zeroXSplit = 0x1AB91D23131E32b848A1Aa2Ba9fd1f7a948E21BE;
 
-  constructor() ERC721K("hedsTAPE 4", "HT4") {
-    // TODO: Update price
+  constructor() ERC721K("hedsTAPE 5", "HT5") {
     saleConfig.price = 0.1 ether;
-    // TODO: Update maxSupply
-    saleConfig.maxSupply = 150;
-    // TODO: Update startTime
-    saleConfig.startTime = 1653159600;
-    // TODO: Update endTime
-    saleConfig.endTime = 1653159600;
+    saleConfig.maxSupply = 1000;
+    saleConfig.startTime = 1655578795;
+    saleConfig.endTime = 1655665200;
   }
 
   /// @notice Mint a HedsTape token

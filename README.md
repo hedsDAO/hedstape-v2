@@ -4,16 +4,16 @@
 
 - [ ] Update baseUri
   - [ ] Remove corresponding todo comment
-- [ ] Update startTime
-  - [ ] Remove corresponding todo comment
-- [ ] Update endTime
-  - [ ] Remove corresponding todo comment
-- [ ] Update 0xsplit address
-  - [ ] Remove corresponding todo comment
-- [ ] Update price
-  - [ ] Remove corresponding todo comment
-- [ ] Update maxSupply
-  - [ ] Remove corresponding todo comment
+- [x] Update startTime
+  - [x] Remove corresponding todo comment
+- [x] Update endTime
+  - [x] Remove corresponding todo comment
+- [x] Update 0xsplit address
+  - [x] Remove corresponding todo comment
+- [x] Update price
+  - [x] Remove corresponding todo comment
+- [x] Update maxSupply
+  - [x] Remove corresponding todo comment
 - [ ] Create release once previous steps complete (Kaden)
 
 ### Todo after deployment:
