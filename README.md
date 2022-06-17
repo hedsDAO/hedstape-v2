@@ -2,8 +2,8 @@
 
 ### Todo before deployment:
 
-- [ ] Update baseUri
-  - [ ] Remove corresponding todo comment
+- [x] Update baseUri
+  - [x] Remove corresponding todo comment
 - [x] Update startTime
   - [x] Remove corresponding todo comment
 - [x] Update endTime
