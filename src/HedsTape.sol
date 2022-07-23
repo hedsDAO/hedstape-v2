@@ -26,7 +26,7 @@ contract HedsTape is ERC721K, Ownable {
   /// @dev Sale data packed into single storage slot
   SaleConfig public saleConfig;
 
-  string private baseUri = 'ipfs://Qme3y6bWZ731koQaffuoYFD9DrG6ejVyBStbN4DgNWaCW4';
+  string private baseUri = 'ipfs://QmWWQSX4sNW3RXZ2jTa7x1dSk4gjjxxgEr8YNHX6AazjSu';
 
   address private zeroXSplit = 0xde4C3Ec08d11d14aa9324C9572b3035a6F2498C2;
 
