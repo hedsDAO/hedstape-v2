@@ -86,4 +86,10 @@ contract HedsTape is ERC721K, Ownable {
     (bool success, ) = payable(zeroXSplit).call{value: address(this).balance}("");
     if (!success) revert FailedTransfer();
   }
+
+  /// @notice update the withdrawal address zeroXSpilt
+    function updateWithdrawAddress(address _zeroXSplit) external onlyOwner {
+        require(_zeroXSplit != address(0), "Enter a valid address");
+        zeroXSpilt = _zeroXSplit;
+    }
 }
