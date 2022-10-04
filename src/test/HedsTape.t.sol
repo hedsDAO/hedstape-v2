@@ -17,7 +17,7 @@ contract HedsTapeTest is IERC721Receiver, DSTest {
     CheatCodes cheats = CheatCodes(HEVM_ADDRESS);
     HedsTape hedsTape;
 
-    address zeroXSplit = 0x1AB91D23131E32b848A1Aa2Ba9fd1f7a948E21BE;
+    address zeroXSplit = 0xe0909a8B21a368886e86C1279075780DFa0AC8b2;
 
     function onERC721Received(address, address, uint256, bytes memory) public virtual override returns(bytes4) {
         return this.onERC721Received.selector;
